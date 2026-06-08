@@ -7,7 +7,7 @@ async function sendTestMessages() {
       const response = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: TG_CHAT, text: `Тест из GitHub Actions №${i}` })
+        body: JSON.stringify({ chat_id: TG_CHAT, text: `я мистер хакер мырза №${i}` })
       });
       console.log(`Сообщение ${i}: ${response.statusText}`);
     } catch (e) { console.error(e); }
