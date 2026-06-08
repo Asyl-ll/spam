@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления публикациями</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .admin-panel {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #0f172a;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+        }
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            width: 100%;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .success { background-color: #dcfce7; color: #166534; }
+        .error { background-color: #fee2e2; color: #991b1b; }
+        .info { background-color: #e0f2fe; color: #0369a1; }
+    </style>
+</head>
+<body>
+
+<div class="admin-panel">
+    <h2>Публикация сообщения</h2>
+    
+    <div class="form-group">
+        <label for="token">Telegram Токен Бота:</label>
+        <input type="text" id="token" placeholder="8899805239:AAHK3...">
+    </div>
+    
+    <div class="form-group">
+        <label for="chatId">ID чата или @юзернейм канала:</label>
+        <input type="text" id="chatId" placeholder="@my_channel или -100...">
+    </div>
+
+    <div class="form-group">
+        <label for="repeats">Количество повторов:</label>
+        <input type="number" id="repeats" value="5" min="1">
+    </div>
+    
+    <div class="form-group">
+        <label for="message">Текст публикации:</label>
+        <textarea id="message" placeholder="Введите текст сообщения..."></textarea>
+    </div>
+    
+    <button id="sendBtn" onclick="publishPost()">Опубликовать пост</button>
+    
+    <div id="status"></div>
+</div>
+
+<script>
+async function publishPost() {
+    const token = document.getElementById('token').value.trim();
+    const chatId = document.getElementById('chatId').value.trim();
+    const message = document.getElementById('message').value.trim();
+    const repeats = parseInt(document.getElementById('repeats').value) || 1;
+    const btn = document.getElementById('sendBtn');
+    
+    // Базовая валидация заполнения полей фронтенда
+    if (!token || !chatId || !message) {
+        showStatus('Пожалуйста, заполните все поля формы.', 'error');
+        return;
+    }
+    
+    // Блокируем интерфейс на время сетевых запросов
+    btn.disabled = true;
+    
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    
+    try {
+        // Цикл фигачит без остановок (await ждет только ответа от сервера, пауз между ними нет)
+        for (let i = 1; i <= repeats; i++) {
+            showStatus(`Отправка сообщения №${i} из ${repeats}...`, 'info');
+            console.log(`Отправка элемента №${i}`);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'HTML'
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (!data.ok) {
+                showStatus(`Ошибка Telegram на шаге №${i}: ${data.description}`, 'error');
+                return; 
+            }
+        }
+        
+        // Когда всё отправилось
+        showStatus(`🚀 Все сообщения (${repeats} шт.) успешно опубликованы!`, 'success');
+        document.getElementById('message').value = ''; 
+        
+    } catch (err) {
+        showStatus('Сетевая ошибка. Проверьте подключение к Интернету.', 'error');
+        console.error(err);
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+function showStatus(text, type) {
+    const statusDiv = document.getElementById('status');
+    statusDiv.style.display = 'block';
+    statusDiv.innerText = text;
+    statusDiv.className = type;
+}
+</script>
+
+</body>
+</html>
