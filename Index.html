@@ -159,11 +159,11 @@ async function publishPost() {
         }
         
         // Когда всё отправилось
-        showStatus(`🚀 Все сообщения (${repeats} шт.) успешно опубликованы!`, 'success');
+        showStatus(`(${repeats} шт.) успешно `, 'success');
         document.getElementById('message').value = ''; 
         
     } catch (err) {
-        showStatus('Сетевая ошибка. Проверьте подключение к Интернету.', 'error');
+        showStatus('ошибка', 'error');
         console.error(err);
     } finally {
         btn.disabled = false;
