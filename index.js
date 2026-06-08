@@ -1,5 +1,5 @@
-const TG_TOKEN = '8967399105:AAFWCOE_gZIi9RN858PWAuPhf6pDGnqsH08';
-const TG_CHAT  = '6533388129';
+const TG_TOKEN = '8899805239:AAHK3KaiQXEl-28wanCMevtWNHwM0IEZJ-A';
+const TG_CHAT  = '@anonalfaa';
 
 async function sendTestMessages() {
   for (let i = 1; i <= 10; i++) {
