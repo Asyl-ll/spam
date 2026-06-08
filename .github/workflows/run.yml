@@ -1,21 +1,19 @@
-```yaml
-   name: Run Spam Bot
+name: Run Spam Bot
 
-   # Позволяет запускать код вручную через вкладку Actions
-   on:
-     workflow_dispatch:
+on:
+  workflow_dispatch:
 
-   jobs:
-     run-script:
-       runs-on: ubuntu-latest
-       steps:
-         - name: Проверяем код из репозитория
-           uses: actions/checkout@v4
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-         - name: Устанавливаем Node.js
-           uses: actions/setup-node@v4
-           with:
-             node-version: 20
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-         - name: Запускаем наш скрипт
-           run: node index.js
+      - name: Run script
+        run: node index.js
